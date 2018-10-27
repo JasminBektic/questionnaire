@@ -1,6 +1,6 @@
 package models
 
-import (  
+import (
 	// "fmt"
 	// "net/http"
 	// "html/template"
@@ -8,11 +8,11 @@ import (
 	"encoding/json"
 )
 
-type Question struct {  
-	Id int`json:"id"`
-    Title   string `json:"title"`
-    Survey_id int `json:"survey_id"`
-    Content string `json:"content"`
+type Question struct {
+	Id        int    `json:"id"`
+	Title     string `json:"title"`
+	Survey_id int    `json:"survey_id"`
+	Content   string `json:"content"`
 }
 
 func (q Question) Get() []byte {
@@ -24,7 +24,7 @@ func (q Question) Get() []byte {
 
 	// var db *sql.DB
 
-	_,err = db.Exec("USE questionnaire")
+	_, err = db.Exec("USE questionnaire")
 	if err != nil {
 		panic(err)
 	}
@@ -53,7 +53,6 @@ func (q Question) Get() []byte {
 	return qs
 }
 
-
 func (q Question) Insert(question Question) sql.Result {
 	db, err := sql.Open("mysql", "phpmyadmin:@tcp(127.0.0.1:3306)/")
 	if err != nil {
@@ -63,7 +62,7 @@ func (q Question) Insert(question Question) sql.Result {
 
 	// var db *sql.DB
 
-	_,err = db.Exec("USE questionnaire")
+	_, err = db.Exec("USE questionnaire")
 	if err != nil {
 		panic(err)
 	}
@@ -89,7 +88,6 @@ func (q Question) Insert(question Question) sql.Result {
 	return res
 }
 
-
 func (q Question) Update(question Question) sql.Result {
 	db, err := sql.Open("mysql", "phpmyadmin:@tcp(127.0.0.1:3306)/")
 	if err != nil {
@@ -99,7 +97,7 @@ func (q Question) Update(question Question) sql.Result {
 
 	// var db *sql.DB
 
-	_,err = db.Exec("USE questionnaire")
+	_, err = db.Exec("USE questionnaire")
 	if err != nil {
 		panic(err)
 	}
@@ -125,7 +123,7 @@ func (q Question) Delete(id int) sql.Result {
 
 	// var db *sql.DB
 
-	_,err = db.Exec("USE questionnaire")
+	_, err = db.Exec("USE questionnaire")
 	if err != nil {
 		panic(err)
 	}
