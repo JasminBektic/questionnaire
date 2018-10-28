@@ -68,6 +68,8 @@ func (reg RegisterController) FinishRegistration(w http.ResponseWriter, r *http.
 		return
 	}
 
+	// TODO: Field validator
+
 	vars := mux.Vars(r)
 
 	user.Email = vars["email"]
@@ -82,7 +84,7 @@ func (reg RegisterController) FinishRegistration(w http.ResponseWriter, r *http.
 
 		return
 	}
-	fmt.Println(user)
+
 	user.Update(user)
 
 	res, _ = json.Marshal("Registration completed.")

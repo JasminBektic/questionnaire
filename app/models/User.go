@@ -2,8 +2,10 @@ package models
 
 import (
 	"database/sql"
-	"fmt"
+	// "fmt"
 	"strings"
+	"crypto/rand"
+	"encoding/base64"
 )
 
 // "fmt"
@@ -94,6 +96,8 @@ func (u User) Update(user User) sql.Result {
 	if err != nil {
 		panic(err)
 	}
+
+	// TODO: password crypt
 	
 	db.QueryRow(`
 	UPDATE users SET username = ?, password = ?, token = NULL WHERE email = ? AND token = ?`, user.Username, user.Password, user.Email, user.Token)
@@ -101,14 +105,13 @@ func (u User) Update(user User) sql.Result {
 	return nil
 }
 
+/*
+ *  Generate random string
+ */
 func (u User) GenerateToken() string {
-	return "token"
-}
+	b := make([]byte, 32)
 
-func (u User) login() {
+	rand.Read(b)
 
-}
-
-func (u User) register() {
-
+	return base64.URLEncoding.EncodeToString(b)
 }
