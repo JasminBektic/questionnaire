@@ -6,6 +6,8 @@ import (
 	"strings"
 	"crypto/rand"
 	"encoding/base64"
+
+	"golang.org/x/crypto/bcrypt"
 )
 
 // "fmt"
@@ -97,7 +99,9 @@ func (u User) Update(user User) sql.Result {
 		panic(err)
 	}
 
-	// TODO: password crypt
+	password, _ := bcrypt.GenerateFromPassword([]byte(user.Password), bcrypt.DefaultCost)
+	
+	user.Password = string(password)
 	
 	db.QueryRow(`
 	UPDATE users SET username = ?, password = ?, token = NULL WHERE email = ? AND token = ?`, user.Username, user.Password, user.Email, user.Token)
