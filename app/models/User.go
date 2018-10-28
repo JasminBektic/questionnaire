@@ -65,6 +65,9 @@ func (u User) FindByFields(m map[string]string) (User, error) {
 	return u, err
 }
 
+/*
+ *  User create
+ */
 func (u User) Insert(user User) User {
 	db, err := sql.Open("mysql", "phpmyadmin:@tcp(127.0.0.1:3306)/")
 	if err != nil {
@@ -85,6 +88,9 @@ func (u User) Insert(user User) User {
 	return user
 }
 
+/*
+ *  User update
+ */
 func (u User) Update(user User) sql.Result {
 	db, err := sql.Open("mysql", "phpmyadmin:@tcp(127.0.0.1:3306)/")
 	if err != nil {
@@ -107,6 +113,29 @@ func (u User) Update(user User) sql.Result {
 	UPDATE users SET username = ?, password = ?, token = NULL WHERE email = ? AND token = ?`, user.Username, user.Password, user.Email, user.Token)
 
 	return nil
+}
+
+func (u User) IsAuthenticated(token string) bool {
+	db, err := sql.Open("mysql", "phpmyadmin:@tcp(127.0.0.1:3306)/")
+	if err != nil {
+		panic(err)
+	}
+	defer db.Close()
+
+	// var db *sql.DB
+
+	_, err = db.Exec("USE questionnaire")
+	if err != nil {
+		panic(err)
+	}
+
+	row := db.QueryRow(`SELECT id FROM users WHERE session_token = ?`, token)
+	err = row.Scan(&u.Id);
+	if err != nil {
+		return false
+	}
+
+	return true
 }
 
 /*

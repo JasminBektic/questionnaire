@@ -45,7 +45,7 @@ func (reg RegisterController) Register(w http.ResponseWriter, r *http.Request) {
 
 	inserted := user.Insert(getUser)
 
-	res, _ = json.Marshal("register/finish/" + inserted.Email + "/" + inserted.Token + "")
+	res, _ = json.Marshal("register/finish/" + inserted.Email + "/" + inserted.Token + " is delivered to email. When you visit link, form is presented - here you will enter username and password")
 
 	w.Write(res)
 }
@@ -68,7 +68,7 @@ func (reg RegisterController) FinishRegistration(w http.ResponseWriter, r *http.
 		return
 	}
 
-	// TODO: Field validator
+	// TODO: Field validator - username and pass
 
 	vars := mux.Vars(r)
 
@@ -87,7 +87,7 @@ func (reg RegisterController) FinishRegistration(w http.ResponseWriter, r *http.
 
 	user.Update(user)
 
-	res, _ = json.Marshal("Registration completed.")
+	res, _ = json.Marshal("Registration completed. Login form is returned.")
 
 	w.Write(res)
 }

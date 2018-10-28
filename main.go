@@ -7,6 +7,7 @@ import (
 
 	"./app/controllers"
 	"./app/controllers/auth"
+	"./app/middleware"
 
 	_ "github.com/go-sql-driver/mysql"
 	"github.com/gorilla/mux"
@@ -129,11 +130,14 @@ func main() {
 	var l auth.LoginController
 	var r auth.RegisterController
 	var q controllers.QuestionController
+	var tm middleware.TokenSessionMiddleware
 	// l.Login()
 
-	router.HandleFunc("/", handler)
+	// router.HandleFunc("/", handler)
+	router.Use(tm.Handle)
+	
 	router.HandleFunc("/login", l.Login)
-	// http.HandleFunc("/logout", l.Login);
+	router.HandleFunc("/logout", l.Login);
 	router.HandleFunc("/register", r.Register).Methods("POST")
 	router.HandleFunc("/register/finish/{email}/{token}", r.FinishRegistration).Methods("POST")
 	// http.HandleFunc("/password_reset", l.Login);
@@ -157,8 +161,4 @@ func main() {
 	// http.HandleFunc("/answer/{id}", q.Get).Methods("DELETE");
 
 	http.ListenAndServe(":8000", router)
-}
-
-func handler(w http.ResponseWriter, r *http.Request) {
-	fmt.Fprint(w, "Homepage")
 }
