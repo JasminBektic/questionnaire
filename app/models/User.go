@@ -3,6 +3,7 @@ package models
 import (
 	"database/sql"
 	"fmt"
+	"strings"
 )
 
 // "fmt"
@@ -35,24 +36,49 @@ type User struct {
 // 	return u
 // }
 
-func (u User) Insert(user User) sql.Result {
+func (u User) FindByFields(m map[string]string) (User, error) {
 	db, err := sql.Open("mysql", "phpmyadmin:@tcp(127.0.0.1:3306)/")
 	if err != nil {
 		panic(err)
 	}
 	defer db.Close()
 
-	// var db *sql.DB
+	_, err = db.Exec("USE questionnaire")
+	if err != nil {
+		panic(err)
+	}
+
+	query := "SELECT fullname, email FROM users WHERE "
+
+	for k, v := range m { 
+		query += k + "='" + v + "' AND "
+	}
+	query = strings.TrimSuffix(query, " AND ")
+
+	row := db.QueryRow(query)
+	err = row.Scan(&u.Fullname, &u.Email);
+
+	return u, err
+}
+
+func (u User) Insert(user User) User {
+	db, err := sql.Open("mysql", "phpmyadmin:@tcp(127.0.0.1:3306)/")
+	if err != nil {
+		panic(err)
+	}
+	defer db.Close()
 
 	_, err = db.Exec("USE questionnaire")
 	if err != nil {
 		panic(err)
 	}
 
-	db.QueryRow(`
-	INSERT INTO users (fullname, email) VALUES (?, ?)`, user.Fullname, user.Email)
+	user.Token = u.GenerateToken()
 
-	return nil
+	db.QueryRow(`
+	INSERT INTO users (fullname, email, token) VALUES (?, ?, ?)`, user.Fullname, user.Email, user.Token)
+
+	return user
 }
 
 func (u User) Update(user User) sql.Result {
@@ -68,11 +94,15 @@ func (u User) Update(user User) sql.Result {
 	if err != nil {
 		panic(err)
 	}
-	fmt.Println(user)
+	
 	db.QueryRow(`
-	UPDATE users SET username = ?, password = ? WHERE email = ? AND token = ?`, user.Username, user.Password, user.Email, user.Token)
+	UPDATE users SET username = ?, password = ?, token = NULL WHERE email = ? AND token = ?`, user.Username, user.Password, user.Email, user.Token)
 
 	return nil
+}
+
+func (u User) GenerateToken() string {
+	return "token"
 }
 
 func (u User) login() {
