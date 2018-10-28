@@ -130,17 +130,19 @@ func main() {
 	var l auth.LoginController
 	var r auth.RegisterController
 	var q controllers.QuestionController
-	var tm middleware.TokenSessionMiddleware
+	var ts middleware.TokenSessionMiddleware
+	var al middleware.AuthLevelMiddleware
 	// l.Login()
 
 	// router.HandleFunc("/", handler)
-	router.Use(tm.Handle)
-	
+	router.Use(ts.Handle)
+	router.Use(al.Handle)
+
 	router.HandleFunc("/login", l.Login)
 	router.HandleFunc("/logout", l.Login);
 	router.HandleFunc("/register", r.Register).Methods("POST")
 	router.HandleFunc("/register/finish/{email}/{token}", r.FinishRegistration).Methods("POST")
-	// http.HandleFunc("/password_reset", l.Login);
+	// http.HandleFunc("/password/reset", l.Login);
 
 	// http.HandleFunc("/survey", q.Get).Methods("GET");
 	// http.HandleFunc("/survey/{id}", q.Get).Methods("GET");

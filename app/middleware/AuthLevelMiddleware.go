@@ -10,25 +10,27 @@ import (
 )
 
 
-type TokenSessionMiddleware struct {
+type AuthLevelMiddleware struct {
 }
 
-func (q TokenSessionMiddleware) Handle(next http.Handler) http.Handler {
+func (q AuthLevelMiddleware) Handle(next http.Handler) http.Handler {
     return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		var route helpers.Route
-		
+
 		if route.IsPublicRoute(r.URL.Path) {
 			next.ServeHTTP(w, r)
 
 			return
 		}
-		
+
 		sessionToken := r.Header.Get("SessionToken")
 
 		var user models.User
 		
-		if !user.IsAuthenticated(sessionToken) {
-			res, _ := json.Marshal("You are not logged in.")
+		authUser, _ := user.GetAuthenticated(sessionToken)
+		
+		if !user.IsAuthorized(authUser, r.URL.Path, r.Method) {
+			res, _ := json.Marshal("You are not authorized to visit this link.")
 			w.Write(res)
 
 			return

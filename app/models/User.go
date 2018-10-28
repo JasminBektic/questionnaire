@@ -6,14 +6,11 @@ import (
 	"strings"
 	"crypto/rand"
 	"encoding/base64"
+	"../helpers"
 
 	"golang.org/x/crypto/bcrypt"
 )
 
-// "fmt"
-// "net/http"
-// "html/template"
-// "database/sql"
 
 type User struct {
 	Id           int    `json:"id"`
@@ -25,20 +22,6 @@ type User struct {
 	Token        string `json:"token"`
 	SessionToken string `json:"session_token"`
 }
-
-// func (u User) Get() {
-// 	db, _ := sql.Open("mysql", "phpmyadmin:@tcp(127.0.0.1:3306)/")
-
-// 	defer db.Close()
-
-// 	_,_ = db.Exec("USE questionnaire")
-
-// 	u, err := db.Query(`
-// 		SELECT * FROM users`)
-// 	defer u.Close()
-
-// 	return u
-// }
 
 func (u User) FindByFields(m map[string]string) (User, error) {
 	db, err := sql.Open("mysql", "phpmyadmin:@tcp(127.0.0.1:3306)/")
@@ -115,6 +98,32 @@ func (u User) Update(user User) sql.Result {
 	return nil
 }
 
+/*
+ *  Check auth user
+ */
+func (u User) GetAuthenticated(token string) (User, error) {
+	db, err := sql.Open("mysql", "phpmyadmin:@tcp(127.0.0.1:3306)/")
+	if err != nil {
+		panic(err)
+	}
+	defer db.Close()
+
+	// var db *sql.DB
+
+	_, err = db.Exec("USE questionnaire")
+	if err != nil {
+		panic(err)
+	}
+
+	row := db.QueryRow(`SELECT id, username, fullname, email, type FROM users WHERE session_token = ?`, token)
+	err = row.Scan(&u.Id, &u.Username, &u.Fullname, &u.Email, &u.Type);
+
+	return u, err
+}
+
+/*
+ *  Check if user session token is set
+ */
 func (u User) IsAuthenticated(token string) bool {
 	db, err := sql.Open("mysql", "phpmyadmin:@tcp(127.0.0.1:3306)/")
 	if err != nil {
@@ -136,6 +145,35 @@ func (u User) IsAuthenticated(token string) bool {
 	}
 
 	return true
+}
+
+/*
+ *  Check if user has right route permissions
+ */
+func (u User) IsAuthorized(user User, path string, method string) bool {
+	var r helpers.Route
+	var routes map[string][]string
+
+	switch user.Type {
+		case 0:
+			routes = r.AdminRoutes()
+		case 1:
+			routes = r.UserRoutes()
+	}
+
+	uriSegments := strings.Split(path, "/")
+
+	for route, methods := range routes { 
+		if uriSegments[1] == route {
+			for _, v := range methods {
+				if method == v {
+					return true
+				}
+			}
+		}
+	}
+
+	return false
 }
 
 /*
