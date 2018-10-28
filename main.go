@@ -100,7 +100,7 @@ func main() {
 	insert, err := db.Query(`
 	INSERT INTO users (
 		username, fullname, email, password
-	) VALUES ('jaskio', 'Jasmin Bektic', 'jaskio89@gmail.com', '111111')`)
+	) VALUES ('jaskio', 'Jasmin Bektic', 'jaskio89@gmail.com', '$2a$10$O.WSJjmRfwuwwxPxSKQPaOEvnZPE0Pi8i/MvZdEb4TBPdzzdDuidi')`)
 	if err != nil {
 		panic(err)
 	}
@@ -139,7 +139,7 @@ func main() {
 	router.Use(al.Handle)
 
 	router.HandleFunc("/login", l.Login)
-	router.HandleFunc("/logout", l.Login);
+	router.HandleFunc("/logout", l.Logout);
 	router.HandleFunc("/register", r.Register).Methods("POST")
 	router.HandleFunc("/register/finish/{email}/{token}", r.FinishRegistration).Methods("POST")
 	// http.HandleFunc("/password/reset", l.Login);

@@ -3,7 +3,6 @@ package models
 import (
 	// "fmt"
 	// "net/http"
-	// "html/template"
 	"database/sql"
 	"encoding/json"
 )

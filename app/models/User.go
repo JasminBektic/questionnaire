@@ -23,6 +23,9 @@ type User struct {
 	SessionToken string `json:"session_token"`
 }
 
+/*
+ *  Find user with multiple field
+ */
 func (u User) FindByFields(m map[string]string) (User, error) {
 	db, err := sql.Open("mysql", "phpmyadmin:@tcp(127.0.0.1:3306)/")
 	if err != nil {
@@ -44,6 +47,27 @@ func (u User) FindByFields(m map[string]string) (User, error) {
 
 	row := db.QueryRow(query)
 	err = row.Scan(&u.Fullname, &u.Email);
+
+	return u, err
+}
+
+/*
+ *  Find user with specific field
+ */
+func (u User) GetUserByField(field string, value string) (User, error) {
+	db, err := sql.Open("mysql", "phpmyadmin:@tcp(127.0.0.1:3306)/")
+	if err != nil {
+		panic(err)
+	}
+	defer db.Close()
+
+	_, err = db.Exec("USE questionnaire")
+	if err != nil {
+		panic(err)
+	}
+
+	row := db.QueryRow(`SELECT id, username, fullname, email, type, password FROM users WHERE ` + field + ` = ?`, value)
+	err = row.Scan(&u.Id, &u.Username, &u.Fullname, &u.Email, &u.Type, &u.Password);
 
 	return u, err
 }
@@ -99,9 +123,9 @@ func (u User) Update(user User) sql.Result {
 }
 
 /*
- *  Check auth user
+ *  Check if user session token is set
  */
-func (u User) GetAuthenticated(token string) (User, error) {
+func (u User) SetAuthToken(user User, activate bool) string {
 	db, err := sql.Open("mysql", "phpmyadmin:@tcp(127.0.0.1:3306)/")
 	if err != nil {
 		panic(err)
@@ -115,10 +139,18 @@ func (u User) GetAuthenticated(token string) (User, error) {
 		panic(err)
 	}
 
-	row := db.QueryRow(`SELECT id, username, fullname, email, type FROM users WHERE session_token = ?`, token)
-	err = row.Scan(&u.Id, &u.Username, &u.Fullname, &u.Email, &u.Type);
+	query := `UPDATE users SET session_token = NULL WHERE id = ?`
+	token := ""
 
-	return u, err
+	if activate {
+		token = u.GenerateToken()
+		query = `UPDATE users SET session_token = '` + token + `' WHERE id = ?`
+	}
+
+	row := db.QueryRow(query, user.Id)
+	err = row.Scan(&u.SessionToken);
+
+	return token
 }
 
 /*

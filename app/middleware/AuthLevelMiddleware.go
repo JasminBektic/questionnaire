@@ -27,7 +27,7 @@ func (q AuthLevelMiddleware) Handle(next http.Handler) http.Handler {
 
 		var user models.User
 		
-		authUser, _ := user.GetAuthenticated(sessionToken)
+		authUser, _ := user.GetUserByField("session_token", sessionToken)
 		
 		if !user.IsAuthorized(authUser, r.URL.Path, r.Method) {
 			res, _ := json.Marshal("You are not authorized to visit this link.")
