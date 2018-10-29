@@ -107,12 +107,11 @@ func main() {
 
 	insert, err := db.Query(`
 	INSERT INTO users (
-		username, fullname, email, password
-	) VALUES ('jaskio', 'Jasmin Bektic', 'jaskio89@gmail.com', '$2a$10$O.WSJjmRfwuwwxPxSKQPaOEvnZPE0Pi8i/MvZdEb4TBPdzzdDuidi')`)
+		username, fullname, email, password, session_token
+	) VALUES ('jaskio', 'Jasmin Bektic', 'jaskio89@gmail.com', '$2a$10$O.WSJjmRfwuwwxPxSKQPaOEvnZPE0Pi8i/MvZdEb4TBPdzzdDuidi', 'token')`)
 	if err != nil {
 		panic(err)
 	}
-
 	defer insert.Close()
 
 	_, err = db.Exec("USE questionnaire")
@@ -127,8 +126,21 @@ func main() {
 	if err != nil {
 		panic(err)
 	}
-
 	defer inserte.Close()
+
+	_, err = db.Exec("USE questionnaire")
+	if err != nil {
+		panic(err)
+	}
+
+	ins, err := db.Query(`
+	INSERT INTO surveys (
+		title
+	) VALUES ('Survey 1')`)
+	if err != nil {
+		panic(err)
+	}
+	defer ins.Close()
 
 	fmt.Println("Logged in database")
 
@@ -139,6 +151,7 @@ func main() {
 	var r auth.RegisterController
 	var pr auth.PasswordResetController
 	var q controllers.QuestionController
+	var s controllers.SurveyController
 	var ts middleware.TokenSessionMiddleware
 	var al middleware.AuthLevelMiddleware
 
@@ -156,11 +169,11 @@ func main() {
 	// router.HandleFunc("/password/reset/{email}/{token}", pr.ResetFinish).Methods("GET")
 	router.HandleFunc("/password/reset/{email}/{token}", pr.ResetFinish).Methods("POST")
 
-	// http.HandleFunc("/survey", q.Get).Methods("GET");
-	// http.HandleFunc("/survey/{id}", q.Get).Methods("GET");
-	// http.HandleFunc("/survey", q.Get).Methods("POST");
-	// http.HandleFunc("/survey", q.Get).Methods("PUT");
-	// http.HandleFunc("/survey/{id}", q.Get).Methods("DELETE");
+	router.HandleFunc("/survey", s.GetAll).Methods("GET")
+	router.HandleFunc("/survey/{id}", s.GetOne).Methods("GET")
+	router.HandleFunc("/survey", s.Insert).Methods("POST")
+	router.HandleFunc("/survey", s.Update).Methods("PUT")
+	router.HandleFunc("/survey/{id}", s.Delete).Methods("DELETE")
 
 	router.HandleFunc("/question", q.Get).Methods("GET")
 	router.HandleFunc("/question/{id}", q.Get).Methods("GET")
