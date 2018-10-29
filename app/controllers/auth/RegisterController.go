@@ -10,7 +10,6 @@ import (
 	"github.com/gorilla/mux"
 )
 
-
 type RegisterController struct {
 }
 
@@ -33,7 +32,7 @@ func (reg RegisterController) Register(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	m := map[string]string{"email":user.Email};
+	m := map[string]string{"email": user.Email}
 
 	getUser, err := user.FindByFields(m)
 	if err == nil {
@@ -75,8 +74,8 @@ func (reg RegisterController) FinishRegistration(w http.ResponseWriter, r *http.
 	user.Email = vars["email"]
 	user.Token = vars["token"]
 
-	m := map[string]string{"email":user.Email, "token":user.Token};
-	
+	m := map[string]string{"email": user.Email, "token": user.Token}
+
 	user, err = user.FindByFields(m)
 	if err != nil {
 		res, _ = json.Marshal("Invalid url or you are already registered.")

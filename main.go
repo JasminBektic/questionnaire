@@ -78,6 +78,14 @@ func main() {
 		panic(err)
 	}
 
+	_, err = db.Exec(`CREATE TABLE IF NOT EXISTS password_resets ( 
+		email VARCHAR(144) NOT NULL,
+		token VARCHAR(255) NOT NULL
+	)`)
+	if err != nil {
+		panic(err)
+	}
+
 	_, err = db.Exec(`TRUNCATE TABLE users`)
 	if err != nil {
 		panic(err)
@@ -129,20 +137,24 @@ func main() {
 	// migrations(db);
 	var l auth.LoginController
 	var r auth.RegisterController
+	var pr auth.PasswordResetController
 	var q controllers.QuestionController
 	var ts middleware.TokenSessionMiddleware
 	var al middleware.AuthLevelMiddleware
-	// l.Login()
 
-	// router.HandleFunc("/", handler)
+	// Middleware
 	router.Use(ts.Handle)
 	router.Use(al.Handle)
 
+	// Routes
 	router.HandleFunc("/login", l.Login)
-	router.HandleFunc("/logout", l.Logout);
+	router.HandleFunc("/logout", l.Logout)
 	router.HandleFunc("/register", r.Register).Methods("POST")
 	router.HandleFunc("/register/finish/{email}/{token}", r.FinishRegistration).Methods("POST")
-	// http.HandleFunc("/password/reset", l.Login);
+	// router.HandleFunc("/password/reset", pr.ResetRequest).Methods("GET")
+	router.HandleFunc("/password/reset", pr.ResetRequest).Methods("POST")
+	// router.HandleFunc("/password/reset/{email}/{token}", pr.ResetFinish).Methods("GET")
+	router.HandleFunc("/password/reset/{email}/{token}", pr.ResetFinish).Methods("POST")
 
 	// http.HandleFunc("/survey", q.Get).Methods("GET");
 	// http.HandleFunc("/survey/{id}", q.Get).Methods("GET");

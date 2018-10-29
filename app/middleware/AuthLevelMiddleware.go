@@ -1,20 +1,20 @@
 package middleware
 
 import (
-	"net/http"
 	"encoding/json"
+	"net/http"
+
 	// "strings"
 
-	"../models"
 	"../helpers"
+	"../models"
 )
-
 
 type AuthLevelMiddleware struct {
 }
 
 func (q AuthLevelMiddleware) Handle(next http.Handler) http.Handler {
-    return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		var route helpers.Route
 
 		if route.IsPublicRoute(r.URL.Path) {
@@ -26,9 +26,9 @@ func (q AuthLevelMiddleware) Handle(next http.Handler) http.Handler {
 		sessionToken := r.Header.Get("SessionToken")
 
 		var user models.User
-		
+
 		authUser, _ := user.GetUserByField("session_token", sessionToken)
-		
+
 		if !user.IsAuthorized(authUser, r.URL.Path, r.Method) {
 			res, _ := json.Marshal("You are not authorized to visit this link.")
 			w.Write(res)
@@ -36,6 +36,6 @@ func (q AuthLevelMiddleware) Handle(next http.Handler) http.Handler {
 			return
 		}
 
-        next.ServeHTTP(w, r)
-    })
+		next.ServeHTTP(w, r)
+	})
 }

@@ -1,16 +1,15 @@
 package models
 
 import (
-	"database/sql"
-	// "fmt"
-	"strings"
 	"crypto/rand"
+	"database/sql"
 	"encoding/base64"
+	"strings"
+
 	"../helpers"
 
 	"golang.org/x/crypto/bcrypt"
 )
-
 
 type User struct {
 	Id           int    `json:"id"`
@@ -40,13 +39,13 @@ func (u User) FindByFields(m map[string]string) (User, error) {
 
 	query := "SELECT fullname, email FROM users WHERE "
 
-	for k, v := range m { 
+	for k, v := range m {
 		query += k + "='" + v + "' AND "
 	}
 	query = strings.TrimSuffix(query, " AND ")
 
 	row := db.QueryRow(query)
-	err = row.Scan(&u.Fullname, &u.Email);
+	err = row.Scan(&u.Fullname, &u.Email)
 
 	return u, err
 }
@@ -66,8 +65,8 @@ func (u User) GetUserByField(field string, value string) (User, error) {
 		panic(err)
 	}
 
-	row := db.QueryRow(`SELECT id, username, fullname, email, type, password FROM users WHERE ` + field + ` = ?`, value)
-	err = row.Scan(&u.Id, &u.Username, &u.Fullname, &u.Email, &u.Type, &u.Password);
+	row := db.QueryRow(`SELECT id, username, fullname, email, type, password FROM users WHERE `+field+` = ?`, value)
+	err = row.Scan(&u.Id, &u.Username, &u.Fullname, &u.Email, &u.Type, &u.Password)
 
 	return u, err
 }
@@ -113,11 +112,114 @@ func (u User) Update(user User) sql.Result {
 	}
 
 	password, _ := bcrypt.GenerateFromPassword([]byte(user.Password), bcrypt.DefaultCost)
-	
+
 	user.Password = string(password)
-	
+
 	db.QueryRow(`
 	UPDATE users SET username = ?, password = ?, token = NULL WHERE email = ? AND token = ?`, user.Username, user.Password, user.Email, user.Token)
+
+	return nil
+}
+
+/*
+ *  Set new password
+ */
+func (u User) UpdatePassword(user User) sql.Result {
+	db, err := sql.Open("mysql", "phpmyadmin:@tcp(127.0.0.1:3306)/")
+	if err != nil {
+		panic(err)
+	}
+	defer db.Close()
+
+	// var db *sql.DB
+
+	_, err = db.Exec("USE questionnaire")
+	if err != nil {
+		panic(err)
+	}
+
+	password, _ := bcrypt.GenerateFromPassword([]byte(user.Password), bcrypt.DefaultCost)
+
+	user.Password = string(password)
+
+	db.QueryRow(`
+	UPDATE users SET password = ? WHERE email = ?`, user.Password, user.Email)
+
+	return nil
+}
+
+/*
+ *  Get row from password_resets table
+ */
+func (u User) GetPasswordReset(user User) (User, error) {
+	db, err := sql.Open("mysql", "phpmyadmin:@tcp(127.0.0.1:3306)/")
+	if err != nil {
+		panic(err)
+	}
+	defer db.Close()
+
+	_, err = db.Exec("USE questionnaire")
+	if err != nil {
+		panic(err)
+	}
+
+	row := db.QueryRow(`SELECT DISTINCT
+							password_resets.email, 
+							password_resets.token 
+						FROM 
+							password_resets
+						INNER JOIN 
+							users ON password_resets.email = users.email
+						WHERE
+							password_resets.email = ? AND password_resets.token = ?`, user.Email, user.Token)
+
+	err = row.Scan(&u.Email, &u.Token)
+
+	return u, err
+}
+
+/*
+ *  Insert into password_resets table
+ */
+func (u User) InsertPasswordReset(user User) User {
+	db, err := sql.Open("mysql", "phpmyadmin:@tcp(127.0.0.1:3306)/")
+	if err != nil {
+		panic(err)
+	}
+	defer db.Close()
+
+	_, err = db.Exec("USE questionnaire")
+	if err != nil {
+		panic(err)
+	}
+
+	user.Token = u.GenerateToken()
+
+	db.QueryRow(`
+	INSERT INTO password_resets (email, token) VALUES (?, ?)`, user.Email, user.Token)
+
+	return user
+}
+
+/*
+ *  Delete resource from password_resets table
+ */
+func (u User) DeletePasswordReset(email string) sql.Result {
+	db, err := sql.Open("mysql", "phpmyadmin:@tcp(127.0.0.1:3306)/")
+	if err != nil {
+		panic(err)
+	}
+	defer db.Close()
+
+	// var db *sql.DB
+
+	_, err = db.Exec("USE questionnaire")
+	if err != nil {
+		panic(err)
+	}
+
+	db.QueryRow(`
+	DELETE FROM password_resets WHERE email = ?`, email)
 
 	return nil
 }
@@ -148,7 +250,7 @@ func (u User) SetAuthToken(user User, activate bool) string {
 	}
 
 	row := db.QueryRow(query, user.Id)
-	err = row.Scan(&u.SessionToken);
+	err = row.Scan(&u.SessionToken)
 
 	return token
 }
@@ -171,7 +273,7 @@ func (u User) IsAuthenticated(token string) bool {
 	}
 
 	row := db.QueryRow(`SELECT id FROM users WHERE session_token = ?`, token)
-	err = row.Scan(&u.Id);
+	err = row.Scan(&u.Id)
 	if err != nil {
 		return false
 	}
@@ -187,15 +289,15 @@ func (u User) IsAuthorized(user User, path string, method string) bool {
 	var routes map[string][]string
 
 	switch user.Type {
-		case 0:
-			routes = r.AdminRoutes()
-		case 1:
-			routes = r.UserRoutes()
+	case 0:
+		routes = r.AdminRoutes()
+	case 1:
+		routes = r.UserRoutes()
 	}
 
 	uriSegments := strings.Split(path, "/")
 
-	for route, methods := range routes { 
+	for route, methods := range routes {
 		if uriSegments[1] == route {
 			for _, v := range methods {
 				if method == v {

@@ -1,15 +1,15 @@
 package auth
 
 import (
-	"fmt"
-	"net/http"
-	"io/ioutil"
 	"encoding/json"
+	"fmt"
+	"io/ioutil"
+	"net/http"
+
 	"../../models"
 
 	"golang.org/x/crypto/bcrypt"
 )
-
 
 type LoginController struct {
 }
@@ -73,7 +73,7 @@ func (l LoginController) Logout(w http.ResponseWriter, r *http.Request) {
 	}
 
 	user.SetAuthToken(authUser, false)
-	
+
 	res, _ = json.Marshal("You logged out.")
 	w.Write(res)
 }
