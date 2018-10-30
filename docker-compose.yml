@@ -1,0 +1,25 @@
+version: '3'
+
+services:
+  questionnaire:
+    image: jasminbektic/questionnaire:latest
+    restart: always
+    build: ./
+    links:
+      - mysql
+    ports:
+      - 8080:8080
+
+  mysql:
+    image: mysql/mysql-server:latest
+    restart: always
+    environment:
+      MYSQL_DATABASE: questionnaire
+      MYSQL_USER: "phpmyadmin"
+      MYSQL_PASSWORD: ""
+      MYSQL_ROOT_PASSWORD: ""
+      MYSQL_ALLOW_EMPTY_PASSWORD: "yes"
+    ports:
+      - 3306:3306
+    volumes:
+      - ./db/questionnaire.sql:/docker-entrypoint-initdb.d/questionnaire.sql

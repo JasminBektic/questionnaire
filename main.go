@@ -22,41 +22,41 @@ func main() {
 
 	// delete later
 	_, err = db.Exec(`DROP DATABASE IF EXISTS questionnaire`)
-	if err != nil {
-		panic(err)
-	}
+	// if err != nil {
+	// 	panic(err)
+	// }
 
 	_, err = db.Exec("CREATE DATABASE IF NOT EXISTS questionnaire DEFAULT CHARACTER SET = 'utf8' DEFAULT COLLATE 'utf8_general_ci'")
-	if err != nil {
-		panic(err)
-	}
+	// if err != nil {
+	// 	panic(err)
+	// }
 
 	_, err = db.Exec("USE questionnaire")
-	if err != nil {
-		panic(err)
-	}
+	// if err != nil {
+	// 	panic(err)
+	// }
 
 	_, err = db.Exec(`CREATE TABLE IF NOT EXISTS users ( 
 		id INT UNSIGNED PRIMARY KEY NOT NULL AUTO_INCREMENT, 
 		username VARCHAR(50) NULL,
-		fullname VARCHAR(50) NULL,
-		email VARCHAR(80) NULL,
+		fullname VARCHAR(50) NOT NULL DEFAULT '',
+		email VARCHAR(80) NOT NULL DEFAULT '',
 		password VARCHAR(255) NULL,
 		type TINYINT(1) DEFAULT 1 COMMENT '0-Admin; 1-User',
 		token VARCHAR(255) NULL,
 		session_token VARCHAR(255) NULL
 	)`)
-	if err != nil {
-		panic(err)
-	}
+	// if err != nil {
+	// 	panic(err)
+	// }
 
 	_, err = db.Exec(`CREATE TABLE IF NOT EXISTS surveys ( 
 		id INT UNSIGNED PRIMARY KEY NOT NULL AUTO_INCREMENT, 
 		title VARCHAR(144) NULL
 	)`)
-	if err != nil {
-		panic(err)
-	}
+	// if err != nil {
+	// 	panic(err)
+	// }
 
 	_, err = db.Exec(`CREATE TABLE IF NOT EXISTS questions ( 
 		id INT UNSIGNED PRIMARY KEY NOT NULL AUTO_INCREMENT, 
@@ -64,9 +64,9 @@ func main() {
 		content JSON NOT NULL,
 		survey_id INT(10) NOT NULL
 	)`)
-	if err != nil {
-		panic(err)
-	}
+	// if err != nil {
+	// 	panic(err)
+	// }
 
 	_, err = db.Exec(`CREATE TABLE IF NOT EXISTS answers ( 
 		id INT UNSIGNED PRIMARY KEY NOT NULL AUTO_INCREMENT, 
@@ -74,27 +74,27 @@ func main() {
 		question_id INT(10) NOT NULL,
 		user_id INT(10) NOT NULL
 	)`)
-	if err != nil {
-		panic(err)
-	}
+	// if err != nil {
+	// 	panic(err)
+	// }
 
 	_, err = db.Exec(`CREATE TABLE IF NOT EXISTS password_resets ( 
 		email VARCHAR(144) NOT NULL,
 		token VARCHAR(255) NOT NULL
 	)`)
-	if err != nil {
-		panic(err)
-	}
+	// if err != nil {
+	// 	panic(err)
+	// }
 
-	_, err = db.Exec(`TRUNCATE TABLE users`)
-	if err != nil {
-		panic(err)
-	}
+	// _, err = db.Exec(`TRUNCATE TABLE users`)
+	// if err != nil {
+	// 	panic(err)
+	// }
 
 	inser, err := db.Query(`
 	INSERT INTO users (
-		username, password
-	) VALUES ('admin', '111111')`)
+		username, password, type
+	) VALUES ('admin', '$2a$10$KSNApbPZhKwJQSCRosTXY.Y2BE5CIrhOyREOBsyYPYMvhK7R4HmV2', 0)`)
 	if err != nil {
 		panic(err)
 	}
@@ -161,8 +161,8 @@ func main() {
 	router.Use(al.Handle)
 
 	// Routes
-	router.HandleFunc("/login", l.Login)
-	router.HandleFunc("/logout", l.Logout)
+	router.HandleFunc("/login", l.Login).Methods("POST")
+	router.HandleFunc("/logout", l.Logout).Methods("GET")
 	router.HandleFunc("/register", r.Register).Methods("POST")
 	router.HandleFunc("/register/finish/{email}/{token}", r.FinishRegistration).Methods("POST")
 	// router.HandleFunc("/password/reset", pr.ResetRequest).Methods("GET")
@@ -182,10 +182,7 @@ func main() {
 	router.HandleFunc("/question", q.Update).Methods("PUT")
 	router.HandleFunc("/question/{id}", q.Delete).Methods("DELETE")
 
-	// router.HandleFunc("/answer", a.Get).Methods("GET")
-	// router.HandleFunc("/answer/{id}", a.Get).Methods("GET")
 	router.HandleFunc("/answer", a.Insert).Methods("POST")
-	// router.HandleFunc("/answer/{id}", a.Delete).Methods("DELETE")
 
 	http.ListenAndServe(":8000", router)
 }
