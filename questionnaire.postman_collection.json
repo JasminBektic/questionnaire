@@ -1,0 +1,411 @@
+{
+	"variables": [],
+	"info": {
+		"name": "questionnaire",
+		"_postman_id": "628cbbe0-e72c-9465-1891-17fff2f14394",
+		"description": "",
+		"schema": "https://schema.getpostman.com/json/collection/v2.0.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "Survey",
+			"description": "",
+			"item": [
+				{
+					"name": "http://localhost:8000/survey/1",
+					"request": {
+						"url": "http://localhost:8000/survey/1",
+						"method": "GET",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"description": ""
+							},
+							{
+								"key": "SessionToken",
+								"value": "pasteTokenHere",
+								"description": ""
+							}
+						],
+						"body": {},
+						"description": ""
+					},
+					"response": []
+				},
+				{
+					"name": "http://localhost:8000/survey",
+					"request": {
+						"url": "http://localhost:8000/survey",
+						"method": "GET",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"description": ""
+							},
+							{
+								"key": "SessionToken",
+								"value": "pasteTokenHere",
+								"description": ""
+							}
+						],
+						"body": {},
+						"description": ""
+					},
+					"response": []
+				},
+				{
+					"name": "http://localhost:8000/survey",
+					"request": {
+						"url": "http://localhost:8000/survey",
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"description": ""
+							},
+							{
+								"key": "SessionToken",
+								"value": "pasteTokenHere",
+								"description": ""
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n\t\"title\": \"New Survey\"\n}"
+						},
+						"description": ""
+					},
+					"response": []
+				},
+				{
+					"name": "http://localhost:8000/survey",
+					"request": {
+						"url": "http://localhost:8000/survey",
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"description": ""
+							},
+							{
+								"key": "SessionToken",
+								"value": "pasteTokenHere",
+								"description": ""
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n\t\"id\": 1,\n\t\"title\": \"Survey Update\"\n}"
+						},
+						"description": ""
+					},
+					"response": []
+				},
+				{
+					"name": "http://localhost:8000/survey/1",
+					"request": {
+						"url": "http://localhost:8000/survey/1",
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"description": ""
+							},
+							{
+								"key": "SessionToken",
+								"value": "pasteTokenHere",
+								"description": ""
+							}
+						],
+						"body": {},
+						"description": ""
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Question",
+			"description": "",
+			"item": [
+				{
+					"name": "http://localhost:8000/question/1",
+					"request": {
+						"url": "http://localhost:8000/question/1",
+						"method": "GET",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"description": ""
+							},
+							{
+								"key": "SessionToken",
+								"value": "pasteTokenHere",
+								"description": ""
+							}
+						],
+						"body": {},
+						"description": ""
+					},
+					"response": []
+				},
+				{
+					"name": "http://localhost:8000/question",
+					"request": {
+						"url": "http://localhost:8000/question",
+						"method": "GET",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"description": ""
+							},
+							{
+								"key": "SessionToken",
+								"value": "pasteTokenHere",
+								"description": ""
+							}
+						],
+						"body": {},
+						"description": ""
+					},
+					"response": []
+				},
+				{
+					"name": "http://localhost:8000/question",
+					"request": {
+						"url": "http://localhost:8000/question",
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"description": ""
+							},
+							{
+								"key": "SessionToken",
+								"value": "pasteTokenHere",
+								"description": ""
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n\t\"title\": \"Question 2\",\n\t\"content\": \"[{'question': 'What is your favourite place to visit?', 'type': 'text'}, {'question': 'Are you under 18 years of age?', 'type': 'select'}]\",\n\t\"survey_id\": 1\n}"
+						},
+						"description": ""
+					},
+					"response": []
+				},
+				{
+					"name": "http://localhost:8000/question",
+					"request": {
+						"url": "http://localhost:8000/question",
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"description": ""
+							},
+							{
+								"key": "SessionToken",
+								"value": "pasteTokenHere",
+								"description": ""
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n\t\"id\": 1,\n\t\"title\": \"Question 1\",\n\t\"content\": \"[{'question': 'Are you the one who knocks?', 'type': 'select'}]\",\n\t\"survey_id\": 2\n}"
+						},
+						"description": ""
+					},
+					"response": []
+				},
+				{
+					"name": "http://localhost:8000/question/1",
+					"request": {
+						"url": "http://localhost:8000/question/1",
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"description": ""
+							},
+							{
+								"key": "SessionToken",
+								"value": "pasteTokenHere",
+								"description": ""
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"description": ""
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Answer",
+			"description": "",
+			"item": [
+				{
+					"name": "http://localhost:8000/answer",
+					"request": {
+						"url": "http://localhost:8000/answer",
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"description": ""
+							},
+							{
+								"key": "SessionToken",
+								"value": "pasteTokenHere",
+								"description": ""
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n\t\"content\": \"{'answer': 'I am the one who knocks'}\",\n\t\"question_id\": 2,\n\t\"user_id\": 2\n}"
+						},
+						"description": ""
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "http://localhost:8000/login",
+			"request": {
+				"url": "http://localhost:8000/login",
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"description": ""
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n\t\"username\": \"admin\",\n\t\"password\": \"password\"\n}"
+				},
+				"description": ""
+			},
+			"response": []
+		},
+		{
+			"name": "http://localhost:8000/logout",
+			"request": {
+				"url": "http://localhost:8000/logout",
+				"method": "GET",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"description": ""
+					},
+					{
+						"key": "SessionToken",
+						"value": "-1KEtFp1C88QQJ4JknVkF_dHkheohKSNBsI0_0_Hk-A=",
+						"description": ""
+					}
+				],
+				"body": {},
+				"description": ""
+			},
+			"response": []
+		},
+		{
+			"name": "http://localhost:8000/register",
+			"request": {
+				"url": "http://localhost:8000/register",
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"description": ""
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n\t\"fullname\": \"John Snow\",\n\t\"email\": \"johny@email.com\"\n}"
+				},
+				"description": ""
+			},
+			"response": []
+		},
+		{
+			"name": "http://localhost:8000/register/finish/test@email.com/YKnaV6XunOl_ZT3PQYiLNBlLWPutUUi71cR0jPN-iSw=",
+			"request": {
+				"url": "http://localhost:8000/register/finish/test@email.com/CHAvSl-FrgPaJ2MXt67FWtsAzcPL4NJS5olP4rCjx-A=",
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"description": ""
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n\t\"username\": \"joe\",\n\t\"password\": \"joe1234\"\n}"
+				},
+				"description": ""
+			},
+			"response": []
+		},
+		{
+			"name": "http://localhost:8000/password/reset",
+			"request": {
+				"url": "http://localhost:8000/password/reset",
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"description": ""
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n\t\"email\": \"test@email.com\"\n}"
+				},
+				"description": ""
+			},
+			"response": []
+		},
+		{
+			"name": "http://localhost:8000/password/reset/test@email.com/\t\njeZq0W-8fyeiCQMxeg01c3advmULMFCaohRxwOnhupo=\n\n\n",
+			"request": {
+				"url": "http://localhost:8000/password/reset/test@email.com/\t\njeZq0W-8fyeiCQMxeg01c3advmULMFCaohRxwOnhupo=\n\n\n",
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"description": ""
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n\t\"password\": \"111111\"\n}"
+				},
+				"description": ""
+			},
+			"response": []
+		}
+	]
+}
