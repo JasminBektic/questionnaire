@@ -152,6 +152,7 @@ func main() {
 	var pr auth.PasswordResetController
 	var q controllers.QuestionController
 	var s controllers.SurveyController
+	var a controllers.AnswerController
 	var ts middleware.TokenSessionMiddleware
 	var al middleware.AuthLevelMiddleware
 
@@ -181,11 +182,10 @@ func main() {
 	router.HandleFunc("/question", q.Update).Methods("PUT")
 	router.HandleFunc("/question/{id}", q.Delete).Methods("DELETE")
 
-	// http.HandleFunc("/answer", q.Get).Methods("GET");
-	// http.HandleFunc("/answer/{id}", q.Get).Methods("GET");
-	// http.HandleFunc("/answer", q.Get).Methods("POST");
-	// http.HandleFunc("/answer", q.Get).Methods("PUT");
-	// http.HandleFunc("/answer/{id}", q.Get).Methods("DELETE");
+	// router.HandleFunc("/answer", a.Get).Methods("GET")
+	// router.HandleFunc("/answer/{id}", a.Get).Methods("GET")
+	router.HandleFunc("/answer", a.Insert).Methods("POST")
+	// router.HandleFunc("/answer/{id}", a.Delete).Methods("DELETE")
 
 	http.ListenAndServe(":8000", router)
 }
