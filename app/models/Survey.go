@@ -1,7 +1,7 @@
 package models
 
 import (
-	"database/sql"
+	"../../db"
 )
 
 type Survey struct {
@@ -14,16 +14,7 @@ type Survey struct {
  *  Get all survey with appropriate questions
  */
 func (s Survey) GetAll() []Survey {
-	db, err := sql.Open("mysql", "phpmyadmin:@tcp(127.0.0.1:3306)/")
-	if err != nil {
-		panic(err)
-	}
-	defer db.Close()
-
-	_, err = db.Exec("USE questionnaire")
-	if err != nil {
-		panic(err)
-	}
+	db, err := db.Open()
 
 	rows, err := db.Query(`SELECT
 							  id, 
@@ -58,16 +49,7 @@ func (s Survey) GetAll() []Survey {
  *  Get one survey with appropriate questions
  */
 func (s Survey) GetOne(id int) (Survey, error) {
-	db, err := sql.Open("mysql", "phpmyadmin:@tcp(127.0.0.1:3306)/")
-	if err != nil {
-		panic(err)
-	}
-	defer db.Close()
-
-	_, err = db.Exec("USE questionnaire")
-	if err != nil {
-		panic(err)
-	}
+	db, err := db.Open()
 
 	var q Question
 
@@ -83,57 +65,25 @@ func (s Survey) GetOne(id int) (Survey, error) {
  *  Insert resource into surveys table
  */
 func (s Survey) Insert(survey Survey) {
-	db, err := sql.Open("mysql", "phpmyadmin:@tcp(127.0.0.1:3306)/")
-	if err != nil {
-		panic(err)
-	}
-	defer db.Close()
+	db, _ := db.Open()
 
-	_, err = db.Exec("USE questionnaire")
-	if err != nil {
-		panic(err)
-	}
-
-	db.QueryRow(`
-	INSERT INTO surveys (title) VALUES (?)`, survey.Title)
+	db.QueryRow(`INSERT INTO surveys (title) VALUES (?)`, survey.Title)
 }
 
 /*
  *  Survey update
  */
 func (s Survey) Update(survey Survey) {
-	db, err := sql.Open("mysql", "phpmyadmin:@tcp(127.0.0.1:3306)/")
-	if err != nil {
-		panic(err)
-	}
-	defer db.Close()
+	db, _ := db.Open()
 
-	_, err = db.Exec("USE questionnaire")
-	if err != nil {
-		panic(err)
-	}
-
-	db.QueryRow(`
-	UPDATE surveys SET title = ? WHERE id = ?`, survey.Title, survey.Id)
+	db.QueryRow(`UPDATE surveys SET title = ? WHERE id = ?`, survey.Title, survey.Id)
 }
 
 /*
  *  Delete resource from surveys table
  */
 func (s Survey) Delete(id int) {
-	db, err := sql.Open("mysql", "phpmyadmin:@tcp(127.0.0.1:3306)/")
-	if err != nil {
-		panic(err)
-	}
-	defer db.Close()
+	db, _ := db.Open()
 
-	// var db *sql.DB
-
-	_, err = db.Exec("USE questionnaire")
-	if err != nil {
-		panic(err)
-	}
-
-	db.QueryRow(`
-	DELETE FROM surveys WHERE id = ?`, id)
+	db.QueryRow(`DELETE FROM surveys WHERE id = ?`, id)
 }

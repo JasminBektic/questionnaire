@@ -1,10 +1,10 @@
 package models
 
 import (
-	// "fmt"
-	// "net/http"
 	"database/sql"
 	"encoding/json"
+
+	"../../db"
 )
 
 type Question struct {
@@ -18,22 +18,9 @@ type Question struct {
  *  Get questions related to survey
  */
 func (q Question) GetForSurvey(id int) []Question {
-	db, err := sql.Open("mysql", "phpmyadmin:@tcp(127.0.0.1:3306)/")
-	if err != nil {
-		panic(err)
-	}
-	defer db.Close()
+	db, err := db.Open()
 
-	// var db *sql.DB
-
-	_, err = db.Exec("USE questionnaire")
-	if err != nil {
-		panic(err)
-	}
-
-	// var rows Question
-	rows, err := db.Query(`
-	SELECT id, title, content FROM questions WHERE survey_id = ?`, id)
+	rows, err := db.Query(`SELECT id, title, content FROM questions WHERE survey_id = ?`, id)
 	if err != nil {
 		panic(err)
 	}
@@ -57,41 +44,17 @@ func (q Question) GetForSurvey(id int) []Question {
  *  Delete questions related to survey
  */
 func (q Question) DeleteForSurvey(id int) {
-	db, err := sql.Open("mysql", "phpmyadmin:@tcp(127.0.0.1:3306)/")
-	if err != nil {
-		panic(err)
-	}
-	defer db.Close()
+	db, _ := db.Open()
 
-	// var db *sql.DB
-
-	_, err = db.Exec("USE questionnaire")
-	if err != nil {
-		panic(err)
-	}
-
-	db.QueryRow(`
-	DELETE FROM questions WHERE survey_id = ?`, id)
+	db.QueryRow(`DELETE FROM questions WHERE survey_id = ?`, id)
 }
 
 /*
  *  Get all questions
  */
 func (q Question) GetAll() []Question {
-	db, err := sql.Open("mysql", "phpmyadmin:@tcp(127.0.0.1:3306)/")
-	if err != nil {
-		panic(err)
-	}
-	defer db.Close()
+	db, err := db.Open()
 
-	// var db *sql.DB
-
-	_, err = db.Exec("USE questionnaire")
-	if err != nil {
-		panic(err)
-	}
-
-	// var rows Question
 	rows, err := db.Query(`SELECT 
 								q.id, 
 								q.title, 
@@ -128,16 +91,7 @@ func (q Question) GetAll() []Question {
  *  Get question
  */
 func (q Question) GetOne(id int) (Question, error) {
-	db, err := sql.Open("mysql", "phpmyadmin:@tcp(127.0.0.1:3306)/")
-	if err != nil {
-		panic(err)
-	}
-	defer db.Close()
-
-	_, err = db.Exec("USE questionnaire")
-	if err != nil {
-		panic(err)
-	}
+	db, err := db.Open()
 
 	var s Survey
 
@@ -163,21 +117,11 @@ func (q Question) GetOne(id int) (Question, error) {
  *  Insert resource into questions table
  */
 func (q Question) Insert(question Question) sql.Result {
-	db, err := sql.Open("mysql", "phpmyadmin:@tcp(127.0.0.1:3306)/")
-	if err != nil {
-		panic(err)
-	}
-	defer db.Close()
+	db, err := db.Open()
 
-	// var db *sql.DB
-
-	_, err = db.Exec("USE questionnaire")
-	if err != nil {
-		panic(err)
-	}
-
-	insert, err := db.Prepare(`
-	INSERT INTO questions (title, content, survey_id) VALUES (?, ?, ?)`)
+	insert, err := db.Prepare(`INSERT INTO 
+								questions (title, content, survey_id) 
+								VALUES (?, ?, ?)`)
 	if err != nil {
 		panic(err)
 	}
@@ -200,26 +144,19 @@ func (q Question) Insert(question Question) sql.Result {
  *  Question update
  */
 func (q Question) Update(question Question) sql.Result {
-	db, err := sql.Open("mysql", "phpmyadmin:@tcp(127.0.0.1:3306)/")
-	if err != nil {
-		panic(err)
-	}
-	defer db.Close()
-
-	// var db *sql.DB
-
-	_, err = db.Exec("USE questionnaire")
-	if err != nil {
-		panic(err)
-	}
+	db, err := db.Open()
 
 	contentJSON, err := json.Marshal(question.Content)
 	if err != nil {
 		panic(err)
 	}
 
-	db.QueryRow(`
-	UPDATE questions SET title = ?, content = ?, survey_id = ? WHERE id = ?`, question.Title, contentJSON, question.Survey_id, question.Id)
+	db.QueryRow(`UPDATE 
+					questions 
+				SET title = ?, 
+					content = ?, 
+					survey_id = ? 
+				WHERE id = ?`, question.Title, contentJSON, question.Survey_id, question.Id)
 
 	return nil
 }
@@ -228,21 +165,9 @@ func (q Question) Update(question Question) sql.Result {
  *  Delete resource from questions table
  */
 func (q Question) Delete(id int) sql.Result {
-	db, err := sql.Open("mysql", "phpmyadmin:@tcp(127.0.0.1:3306)/")
-	if err != nil {
-		panic(err)
-	}
-	defer db.Close()
+	db, _ := db.Open()
 
-	// var db *sql.DB
-
-	_, err = db.Exec("USE questionnaire")
-	if err != nil {
-		panic(err)
-	}
-
-	db.QueryRow(`
-	DELETE FROM questions WHERE id = ?`, id)
+	db.QueryRow(`DELETE FROM questions WHERE id = ?`, id)
 
 	return nil
 }

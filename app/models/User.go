@@ -6,6 +6,7 @@ import (
 	"encoding/base64"
 	"strings"
 
+	"../../db"
 	"../helpers"
 
 	"golang.org/x/crypto/bcrypt"
@@ -26,18 +27,14 @@ type User struct {
  *  Find user with multiple field
  */
 func (u User) FindByFields(m map[string]string) (User, error) {
-	db, err := sql.Open("mysql", "phpmyadmin:@tcp(127.0.0.1:3306)/")
-	if err != nil {
-		panic(err)
-	}
-	defer db.Close()
+	db, err := db.Open()
 
-	_, err = db.Exec("USE questionnaire")
-	if err != nil {
-		panic(err)
-	}
-
-	query := "SELECT fullname, email FROM users WHERE "
+	query := `SELECT 
+				fullname, 
+				email 
+			FROM 
+				users 
+			WHERE `
 
 	for k, v := range m {
 		query += k + "='" + v + "' AND "
@@ -54,18 +51,19 @@ func (u User) FindByFields(m map[string]string) (User, error) {
  *  Find user with specific field
  */
 func (u User) GetUserByField(field string, value string) (User, error) {
-	db, err := sql.Open("mysql", "phpmyadmin:@tcp(127.0.0.1:3306)/")
-	if err != nil {
-		panic(err)
-	}
-	defer db.Close()
+	db, err := db.Open()
 
-	_, err = db.Exec("USE questionnaire")
-	if err != nil {
-		panic(err)
-	}
+	row := db.QueryRow(`SELECT 
+							id, 
+							username, 
+							fullname, 
+							email, 
+							type, 
+							password 
+						FROM 
+							users 
+						WHERE `+field+` = ?`, value)
 
-	row := db.QueryRow(`SELECT id, username, fullname, email, type, password FROM users WHERE `+field+` = ?`, value)
 	err = row.Scan(&u.Id, &u.Username, &u.Fullname, &u.Email, &u.Type, &u.Password)
 
 	return u, err
@@ -75,21 +73,13 @@ func (u User) GetUserByField(field string, value string) (User, error) {
  *  User create
  */
 func (u User) Insert(user User) User {
-	db, err := sql.Open("mysql", "phpmyadmin:@tcp(127.0.0.1:3306)/")
-	if err != nil {
-		panic(err)
-	}
-	defer db.Close()
-
-	_, err = db.Exec("USE questionnaire")
-	if err != nil {
-		panic(err)
-	}
+	db, _ := db.Open()
 
 	user.Token = u.GenerateToken()
 
-	db.QueryRow(`
-	INSERT INTO users (fullname, email, token) VALUES (?, ?, ?)`, user.Fullname, user.Email, user.Token)
+	db.QueryRow(`INSERT 
+					INTO users (fullname, email, token) 
+					VALUES (?, ?, ?)`, user.Fullname, user.Email, user.Token)
 
 	return user
 }
@@ -98,25 +88,18 @@ func (u User) Insert(user User) User {
  *  User update
  */
 func (u User) Update(user User) sql.Result {
-	db, err := sql.Open("mysql", "phpmyadmin:@tcp(127.0.0.1:3306)/")
-	if err != nil {
-		panic(err)
-	}
-	defer db.Close()
-
-	// var db *sql.DB
-
-	_, err = db.Exec("USE questionnaire")
-	if err != nil {
-		panic(err)
-	}
+	db, _ := db.Open()
 
 	password, _ := bcrypt.GenerateFromPassword([]byte(user.Password), bcrypt.DefaultCost)
 
 	user.Password = string(password)
 
-	db.QueryRow(`
-	UPDATE users SET username = ?, password = ?, token = NULL WHERE email = ? AND token = ?`, user.Username, user.Password, user.Email, user.Token)
+	db.QueryRow(`UPDATE 
+					users 
+				SET username = ?, 
+					password = ?, 
+					token = NULL 
+				WHERE email = ? AND token = ?`, user.Username, user.Password, user.Email, user.Token)
 
 	return nil
 }
@@ -125,25 +108,16 @@ func (u User) Update(user User) sql.Result {
  *  Set new password
  */
 func (u User) UpdatePassword(user User) sql.Result {
-	db, err := sql.Open("mysql", "phpmyadmin:@tcp(127.0.0.1:3306)/")
-	if err != nil {
-		panic(err)
-	}
-	defer db.Close()
-
-	// var db *sql.DB
-
-	_, err = db.Exec("USE questionnaire")
-	if err != nil {
-		panic(err)
-	}
+	db, _ := db.Open()
 
 	password, _ := bcrypt.GenerateFromPassword([]byte(user.Password), bcrypt.DefaultCost)
 
 	user.Password = string(password)
 
-	db.QueryRow(`
-	UPDATE users SET password = ? WHERE email = ?`, user.Password, user.Email)
+	db.QueryRow(`UPDATE 
+					users 
+				SET password = ? 
+				WHERE email = ?`, user.Password, user.Email)
 
 	return nil
 }
@@ -152,16 +126,7 @@ func (u User) UpdatePassword(user User) sql.Result {
  *  Get row from password_resets table
  */
 func (u User) GetPasswordReset(user User) (User, error) {
-	db, err := sql.Open("mysql", "phpmyadmin:@tcp(127.0.0.1:3306)/")
-	if err != nil {
-		panic(err)
-	}
-	defer db.Close()
-
-	_, err = db.Exec("USE questionnaire")
-	if err != nil {
-		panic(err)
-	}
+	db, err := db.Open()
 
 	row := db.QueryRow(`SELECT DISTINCT
 							password_resets.email, 
@@ -182,21 +147,13 @@ func (u User) GetPasswordReset(user User) (User, error) {
  *  Insert into password_resets table
  */
 func (u User) InsertPasswordReset(user User) User {
-	db, err := sql.Open("mysql", "phpmyadmin:@tcp(127.0.0.1:3306)/")
-	if err != nil {
-		panic(err)
-	}
-	defer db.Close()
-
-	_, err = db.Exec("USE questionnaire")
-	if err != nil {
-		panic(err)
-	}
+	db, _ := db.Open()
 
 	user.Token = u.GenerateToken()
 
-	db.QueryRow(`
-	INSERT INTO password_resets (email, token) VALUES (?, ?)`, user.Email, user.Token)
+	db.QueryRow(`INSERT 
+					INTO password_resets (email, token) 
+					VALUES (?, ?)`, user.Email, user.Token)
 
 	return user
 }
@@ -205,21 +162,9 @@ func (u User) InsertPasswordReset(user User) User {
  *  Delete resource from password_resets table
  */
 func (u User) DeletePasswordReset(email string) sql.Result {
-	db, err := sql.Open("mysql", "phpmyadmin:@tcp(127.0.0.1:3306)/")
-	if err != nil {
-		panic(err)
-	}
-	defer db.Close()
+	db, _ := db.Open()
 
-	// var db *sql.DB
-
-	_, err = db.Exec("USE questionnaire")
-	if err != nil {
-		panic(err)
-	}
-
-	db.QueryRow(`
-	DELETE FROM password_resets WHERE email = ?`, email)
+	db.QueryRow(`DELETE FROM password_resets WHERE email = ?`, email)
 
 	return nil
 }
@@ -228,15 +173,7 @@ func (u User) DeletePasswordReset(email string) sql.Result {
  *  Check if user session token is set
  */
 func (u User) SetAuthToken(user User, activate bool) string {
-	db, err := sql.Open("mysql", "phpmyadmin:@tcp(127.0.0.1:3306)/")
-	if err != nil {
-		panic(err)
-	}
-	defer db.Close()
-
-	// var db *sql.DB
-
-	_, err = db.Exec("USE questionnaire")
+	db, err := db.Open()
 	if err != nil {
 		panic(err)
 	}
@@ -259,18 +196,7 @@ func (u User) SetAuthToken(user User, activate bool) string {
  *  Check if user session token is set
  */
 func (u User) IsAuthenticated(token string) bool {
-	db, err := sql.Open("mysql", "phpmyadmin:@tcp(127.0.0.1:3306)/")
-	if err != nil {
-		panic(err)
-	}
-	defer db.Close()
-
-	// var db *sql.DB
-
-	_, err = db.Exec("USE questionnaire")
-	if err != nil {
-		panic(err)
-	}
+	db, err := db.Open()
 
 	row := db.QueryRow(`SELECT id FROM users WHERE session_token = ?`, token)
 	err = row.Scan(&u.Id)

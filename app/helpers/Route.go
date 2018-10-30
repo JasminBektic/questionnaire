@@ -1,11 +1,7 @@
 package helpers
 
 import (
-	// "net/http"
-	// "encoding/json"
 	"strings"
-
-	// "../models"
 )
 
 type Route struct {
@@ -17,10 +13,11 @@ type Route struct {
 func (r Route) IsPublicRoute(path string) bool {
 	uriSegments := strings.Split(path, "/")
 
-	excludedRoutes := [4]string{"login", 
-								"logout", 
-								"register", 
-								"password"}
+	excludedRoutes := [4]string{
+		"login",
+		"logout",
+		"register",
+		"password"}
 
 	for _, n := range excludedRoutes {
 		if uriSegments[1] == n {
@@ -35,9 +32,10 @@ func (r Route) IsPublicRoute(path string) bool {
  *  Admin route map
  */
 func (r Route) AdminRoutes() map[string][]string {
-	routes := map[string][]string{"survey":  []string{"GET", "POST", "PUT", "DELETE"}, 
-								  "question":[]string{"GET", "POST", "PUT", "DELETE"},
-								  "answer":  []string{"GET", "DELETE"}};
+	routes := map[string][]string{
+		"survey":   []string{"GET", "POST", "PUT", "DELETE"},
+		"question": []string{"GET", "POST", "PUT", "DELETE"},
+		"answer":   []string{"GET", "DELETE"}}
 
 	return routes
 }
@@ -46,8 +44,9 @@ func (r Route) AdminRoutes() map[string][]string {
  *  User route map
  */
 func (r Route) UserRoutes() map[string][]string {
-	routes := map[string][]string{"survey":  []string{"GET"},
-								  "answer":  []string{"POST"}};
+	routes := map[string][]string{
+		"survey": []string{"GET"},
+		"answer": []string{"POST"}}
 
 	return routes
 }

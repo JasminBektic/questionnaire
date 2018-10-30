@@ -3,6 +3,8 @@ package models
 import (
 	"database/sql"
 	"encoding/json"
+
+	"../../db"
 )
 
 type Answer struct {
@@ -16,18 +18,7 @@ type Answer struct {
  *  Insert resource into answers table
  */
 func (a Answer) Insert(answer Answer) sql.Result {
-	db, err := sql.Open("mysql", "phpmyadmin:@tcp(127.0.0.1:3306)/")
-	if err != nil {
-		panic(err)
-	}
-	defer db.Close()
-
-	// var db *sql.DB
-
-	_, err = db.Exec("USE questionnaire")
-	if err != nil {
-		panic(err)
-	}
+	db, err := db.Open()
 
 	insert, err := db.Prepare(`
 	INSERT INTO answers (content, question_id, user_id) VALUES (?, ?, ?)`)
@@ -53,18 +44,7 @@ func (a Answer) Insert(answer Answer) sql.Result {
  *  Get one survey with appropriate questions
  */
 func (a Answer) IsAnswered(answer Answer) bool {
-	db, err := sql.Open("mysql", "phpmyadmin:@tcp(127.0.0.1:3306)/")
-	if err != nil {
-		panic(err)
-	}
-	defer db.Close()
-
-	// var db *sql.DB
-
-	_, err = db.Exec("USE questionnaire")
-	if err != nil {
-		panic(err)
-	}
+	db, err := db.Open()
 
 	row := db.QueryRow(`SELECT id FROM answers WHERE question_id = ? AND user_id = ?`, answer.Question_id, answer.User_id)
 	err = row.Scan(&a.Id)
