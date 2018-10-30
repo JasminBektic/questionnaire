@@ -175,8 +175,8 @@ func main() {
 	router.HandleFunc("/survey", s.Update).Methods("PUT")
 	router.HandleFunc("/survey/{id}", s.Delete).Methods("DELETE")
 
-	router.HandleFunc("/question", q.Get).Methods("GET")
-	router.HandleFunc("/question/{id}", q.Get).Methods("GET")
+	router.HandleFunc("/question", q.GetAll).Methods("GET")
+	router.HandleFunc("/question/{id}", q.GetOne).Methods("GET")
 	router.HandleFunc("/question", q.Insert).Methods("POST")
 	router.HandleFunc("/question", q.Update).Methods("PUT")
 	router.HandleFunc("/question/{id}", q.Delete).Methods("DELETE")

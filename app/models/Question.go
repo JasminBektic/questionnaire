@@ -14,6 +14,9 @@ type Question struct {
 	Content   string `json:"content"`
 }
 
+/*
+ *  Get questions related to survey
+ */
 func (q Question) GetForSurvey(id int) []Question {
 	db, err := sql.Open("mysql", "phpmyadmin:@tcp(127.0.0.1:3306)/")
 	if err != nil {
@@ -50,6 +53,9 @@ func (q Question) GetForSurvey(id int) []Question {
 	return questions
 }
 
+/*
+ *  Delete questions related to survey
+ */
 func (q Question) DeleteForSurvey(id int) {
 	db, err := sql.Open("mysql", "phpmyadmin:@tcp(127.0.0.1:3306)/")
 	if err != nil {
@@ -68,7 +74,10 @@ func (q Question) DeleteForSurvey(id int) {
 	DELETE FROM questions WHERE survey_id = ?`, id)
 }
 
-func (q Question) Get() []byte {
+/*
+ *  Get all questions
+ */
+func (q Question) GetAll() []Question {
 	db, err := sql.Open("mysql", "phpmyadmin:@tcp(127.0.0.1:3306)/")
 	if err != nil {
 		panic(err)
@@ -83,8 +92,17 @@ func (q Question) Get() []byte {
 	}
 
 	// var rows Question
-	rows, err := db.Query(`
-	SELECT title, content, survey_id FROM questions`)
+	rows, err := db.Query(`SELECT 
+								q.id, 
+								q.title, 
+								q.content, 
+								q.survey_id,
+								s.id,
+								s.title AS survey_title
+							FROM 
+								questions q
+							LEFT JOIN
+								surveys s ON q.survey_id = s.id`)
 	if err != nil {
 		panic(err)
 	}
@@ -93,7 +111,9 @@ func (q Question) Get() []byte {
 	var questions []Question
 
 	for rows.Next() {
-		err := rows.Scan(&q.Title, &q.Content, &q.Survey_id)
+		var s Survey
+
+		err := rows.Scan(&q.Id, &q.Title, &q.Content, &q.Survey_id, &s.Id, &s.Title)
 		if err != nil {
 			continue
 		}
@@ -101,11 +121,47 @@ func (q Question) Get() []byte {
 		questions = append(questions, q)
 	}
 
-	qs, _ := json.Marshal(&questions)
-
-	return qs
+	return questions
 }
 
+/*
+ *  Get question
+ */
+func (q Question) GetOne(id int) (Question, error) {
+	db, err := sql.Open("mysql", "phpmyadmin:@tcp(127.0.0.1:3306)/")
+	if err != nil {
+		panic(err)
+	}
+	defer db.Close()
+
+	_, err = db.Exec("USE questionnaire")
+	if err != nil {
+		panic(err)
+	}
+
+	var s Survey
+
+	row := db.QueryRow(`SELECT 
+							q.id, 
+							q.title, 
+							q.content, 
+							q.survey_id, 
+							s.id, 
+							s.title AS survey_title
+						FROM 
+							questions q
+						LEFT JOIN
+							surveys s ON q.survey_id = s.id  
+						WHERE q.id = ?`, id)
+
+	err = row.Scan(&q.Id, &q.Title, &q.Content, &q.Survey_id, &s.Id, &s.Title)
+
+	return q, err
+}
+
+/*
+ *  Insert resource into questions table
+ */
 func (q Question) Insert(question Question) sql.Result {
 	db, err := sql.Open("mysql", "phpmyadmin:@tcp(127.0.0.1:3306)/")
 	if err != nil {
@@ -120,7 +176,6 @@ func (q Question) Insert(question Question) sql.Result {
 		panic(err)
 	}
 
-	// var rows Question
 	insert, err := db.Prepare(`
 	INSERT INTO questions (title, content, survey_id) VALUES (?, ?, ?)`)
 	if err != nil {
@@ -141,6 +196,9 @@ func (q Question) Insert(question Question) sql.Result {
 	return res
 }
 
+/*
+ *  Question update
+ */
 func (q Question) Update(question Question) sql.Result {
 	db, err := sql.Open("mysql", "phpmyadmin:@tcp(127.0.0.1:3306)/")
 	if err != nil {
@@ -160,13 +218,15 @@ func (q Question) Update(question Question) sql.Result {
 		panic(err)
 	}
 
-	// var rows Question
 	db.QueryRow(`
-	UPDATE questions SET title = ?, content = ? WHERE id = ?`, question.Title, contentJSON, question.Id)
+	UPDATE questions SET title = ?, content = ?, survey_id = ? WHERE id = ?`, question.Title, contentJSON, question.Survey_id, question.Id)
 
 	return nil
 }
 
+/*
+ *  Delete resource from questions table
+ */
 func (q Question) Delete(id int) sql.Result {
 	db, err := sql.Open("mysql", "phpmyadmin:@tcp(127.0.0.1:3306)/")
 	if err != nil {

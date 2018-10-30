@@ -2,6 +2,7 @@ package controllers
 
 import (
 	"encoding/json"
+	"fmt"
 	"io/ioutil"
 	"net/http"
 	"strconv"
@@ -65,6 +66,7 @@ func (s SurveyController) Insert(w http.ResponseWriter, r *http.Request) {
 
 	err = json.Unmarshal(body, &survey)
 	if err != nil {
+		fmt.Println(err)
 		return
 	}
 
@@ -91,6 +93,7 @@ func (s SurveyController) Update(w http.ResponseWriter, r *http.Request) {
 
 	err = json.Unmarshal(body, &survey)
 	if err != nil {
+		fmt.Println(err)
 		return
 	}
 
